@@ -41,20 +41,23 @@ Because rule conclusions are fuzzy sets (e.g. "Very High"), which are clipped, a
 **13. What is implication and what is aggregation?**
 Implication: clip the output set at the rule's strength (`np.minimum`). Aggregation: combine all clipped sets using maximum (`np.maximum`). Both are in `aggregate_output`.
 
+**14. What inference rule does your project use?**
+It uses a Mamdani-style fuzzy inference system: each IF–THEN rule's AND conditions are evaluated with the minimum, the output set is clipped at that firing strength, and rule outputs are combined with maximum before centroid defuzzification.
+
 ## Defuzzification
-**14. What is defuzzification and why is it needed?**
+**15. What is defuzzification and why is it needed?**
 Converting the aggregated fuzzy shape into one number; an actuator or user needs a single irrigation percentage.
 
-**15. How does centroid work in your code?**
+**16. How does centroid work in your code?**
 `sum(x · μ(x)) / sum(μ(x))` over 1001 points (0, 0.1 … 100): the centre of gravity of the shape. Function `centroid` in `fuzzy_engine.py`.
 
-**16. Why centroid and not mean of maxima?**
+**17. Why centroid and not mean of maxima?**
 Centroid uses the entire shape, so every fired rule contributes and the output changes smoothly. Mean of maxima ignores everything but the peak and jumps.
 
-**17. Why are category and number separate? Why can they differ?**
+**18. Why are category and number separate? Why can they differ?**
 The number is the centroid of the whole shape; the category is the output set with the highest firing strength. For (28, 34, 40) Very High fires at 0.5 and High at only 0.12, so category = Very High, while the centroid 77.3 % lies between the High and Very High sets because the weaker rules pull it down.
 
-**18. Why does irrigation never reach exactly 0 % or 100 %?**
+**19. Why does irrigation never reach exactly 0 % or 100 %?**
 Centroid averages over a clipped shape that has width, so the result stays inside the shape: Very Low gives about 9 %, Very High about 91 %. This is a known property of centroid defuzzification with this output design.
 
 ## Comparison and design

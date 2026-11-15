@@ -29,7 +29,7 @@ RECOMMENDATIONS = {
 }
 
 
-# --- input validation ------------------------------------------------------
+# input validation
 def validate_inputs(soil_moisture: float, temperature: float, humidity: float) -> None:
     """Raise ValueError if an input is not a finite number inside its range."""
     values = {"soil_moisture": soil_moisture, "temperature": temperature, "humidity": humidity}
@@ -44,7 +44,7 @@ def validate_inputs(soil_moisture: float, temperature: float, humidity: float) -
             )
 
 
-# --- stage 2: rule evaluation ---------------------------------------------
+# stage 2: rule evaluation 
 def rule_firing_strength(rule: Rule, memberships: dict) -> float:
     """Firing strength = smallest membership among the rule's conditions (AND = min)."""
     degrees = [memberships[variable][set_name] for variable, set_name in rule.conditions().items()]
@@ -56,7 +56,7 @@ def evaluate_rules(memberships: dict, rules: list[Rule] = RULES) -> list[tuple[R
     return [(rule, rule_firing_strength(rule, memberships)) for rule in rules]
 
 
-# --- stages 3 + 4: implication and aggregation -------------------------------
+# stages 3 + 4: implication and aggregation
 def aggregate_output(rule_strengths: list[tuple[Rule, float]]) -> np.ndarray:
     """Mamdani implication (clip with min) followed by aggregation (max)."""
     aggregated = np.zeros_like(OUTPUT_UNIVERSE)
@@ -69,7 +69,7 @@ def aggregate_output(rule_strengths: list[tuple[Rule, float]]) -> np.ndarray:
     return aggregated
 
 
-# --- stage 5: defuzzification ------------------------------------------------
+#  5: defuzzification 
 def centroid(universe: np.ndarray, membership: np.ndarray) -> float:
     """Centre of gravity: sum(x * membership) / sum(membership)."""
     total = membership.sum()
@@ -78,7 +78,7 @@ def centroid(universe: np.ndarray, membership: np.ndarray) -> float:
     return float((universe * membership).sum() / total)
 
 
-# --- category (separate from the crisp number) -------------------------------
+#category (separate from the crisp number) 
 def output_set_strengths(rule_strengths: list[tuple[Rule, float]]) -> dict:
     """Strongest firing strength reaching each output fuzzy set."""
     strengths = {name: 0.0 for name in IRRIGATION.sets}
@@ -94,7 +94,7 @@ def choose_category(set_strengths: dict, level: float) -> str:
                key=lambda name: (set_strengths[name], float(IRRIGATION.sets[name].membership(level))))
 
 
-# --- public function ---------------------------------------------------------
+#public function 
 def calculate_irrigation(soil_moisture: float, temperature: float, humidity: float) -> dict:
     """Run the full Mamdani pipeline and return the result with the fuzzy analysis."""
     validate_inputs(soil_moisture, temperature, humidity)
